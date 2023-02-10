@@ -1,70 +1,32 @@
 [
 	{
 		"zone": "example1.com",
-		"a_records": [
-            {"a":"@", "ip": "10.0.0.5"},
-            {"a":"ns1", "ip": "10.0.0.6"},
-            {"a":"ns2", "ip": "10.0.0.7"},
-            {"a":"ns3", "ip": "10.0.0.8"}
-        ],
-		"cname_records": [
-            {"cname":"www", "pointer": "@"}
+        "soa": "ns1.nameserver.com",
+        "email": "user@domain.com",
+		"records": [
+            {"type":"a", "name":"@", "pointer": "123.123.123.123"},
+            {"type":"a", "name":"server1", "pointer": "1.2.3.4"},
+            {"type":"a", "name":"server2", "pointer": "5.6.7.8"},
+            {"type":"cname", "name":"www", "pointer": "@"},
+            {"type":"cname", "name":"cloud", "pointer": "server1.example1.com."},
+            {"type":"cname", "name":"files", "pointer": "server2.example1.com."}
         ]
 	},
 	{
 		"zone": "example2.com",
-		"a_records": [
-            {"a":"@", "ip": "10.0.0.5"},
-            {"a":"ns1", "ip": "10.0.0.6"},
-            {"a":"ns2", "ip": "10.0.0.7"},
-            {"a":"ns3", "ip": "10.0.0.8"},
-            {"a":"colorado", "ip": "10.0.0.10"},
-            {"a":"florida", "ip": "10.0.0.15"},
-            {"a":"colombia", "ip": "10.0.0.16"},
-            {"a":"vietnam", "ip": "10.0.0.17"},
-            {"a":"turkey", "ip": "10.0.0.18"},
-            {"a":"italy", "ip": "10.0.0.19"},
-            {"a":"morocco", "ip": "10.0.0.20"}
-        ],
-		"cname_records": [
-            {"cname":"www", "pointer": "@"},
-            {"cname":"marrakesh", "pointer": "morocco"},
-            {"cname":"medellin", "pointer": "colombia"},
-            {"cname":"delat", "pointer": "vietnam"},
-            {"cname":"miami", "pointer": "florida"},
-            {"cname":"boulder", "pointer": "colorado"},
-            {"cname":"medellin", "pointer": "colombia"},
-            {"cname":"jardin", "pointer": "colombia"},
-            {"cname":"bogota", "pointer": "colombia"},
-            {"cname":"cartegena", "pointer": "colombia"},
-            {"cname":"instabul", "pointer": "turkey"},
-            {"cname":"ankara", "pointer": "turkey"},
-            {"cname":"monopoli", "pointer": "italy"},
-            {"cname":"torino", "pointer": "italy"},
-            {"cname":"tangiers", "pointer": "morocco"}
+        "soa": "ns1.anothernameserver.us",
+        "email": "you@domain.com",
+		"records": [
+            {"type":"a", "name":"@", "pointer": "1.1.1.1"},
+            {"type":"cname", "name":"www", "pointer": "@"}
         ]
 	},
 	{
-		"zone": "example3.com",
-		"a_records": [
-            {"a":"@", "ip": "192.168.0.50"},
-            {"a":"webserver", "ip": "192.168.0.51"},
-            {"a":"ns1", "ip": "192.168.0.55"},
-            {"a":"ns2", "ip": "192.168.0.56"},
-            {"a":"ns3", "ip": "192.168.0.57"}
-        ],
-		"cname_records": [
-            {"cname":"www", "pointer": "webserver"}
-        ]
-	},
-	{
-		"zone": "example4.com",
-		"a_records": [
-            {"a":"@", "ip": "214.41.23.3"},
-            {"a":"londonoffice", "ip": "214.41.23.3"},
-            {"a":"londonwarehouse", "ip": "214.41.0.78"},
-            {"a":"michiganfactory", "ip": "18.47.170.8"},
-            {"a":"michiganmanagment", "ip": "18.47.170.7"}
+		"zone": "example3.net",
+        "soa": "ns1.skipitydoda.com",
+        "email": "email@domain.com",
+		"records": [
+            {"type":"cname", "name":"www", "pointer": "example1.com"}
         ]
 	}
 ]

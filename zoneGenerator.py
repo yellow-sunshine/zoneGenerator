@@ -8,6 +8,8 @@ from pathlib import Path
 if float(str(sys.version_info[0]) + '.' + str(sys.version_info[1])) < 3.6:
     raise_ex("Please upgrade to Python 3.7 or later", True)
 
+cwd = os.getcwd()
+
 
 def raise_ex(msg, terminate):
     print(msg)
@@ -37,8 +39,8 @@ def getzones():
     return zoneFilejson
 
 
-def writeZone(filename, string):
-    print("writing File:", filename)
+def writeFile(filename, string):
+    print("writing File:", os.path.basename(filename))
     try:
         f = open(filename, "w")
         f.write(string)
@@ -55,14 +57,16 @@ def json2Dict(json):
     outerConfig = []
     for item in json:
         innerConfig = []
-        innerConfig.extend([0, 1, 2])  # Create dict so it is available for use
+        innerConfig.extend([0, 1, 2, 3])  # Create dict so it is available for use
         for key in item:
             if key == 'zone':
                 innerConfig[0] = json[outer][key]
-            elif key == 'a_records':
+            elif key == 'records':
                 innerConfig[1] = json[outer][key]
-            elif key == 'cname_records':
+            elif key == 'soa':
                 innerConfig[2] = json[outer][key]
+            elif key == 'email':
+                innerConfig[3] = json[outer][key]
             else:
                 continue
         outerConfig.append(innerConfig)
@@ -74,26 +78,30 @@ def createZoneFiles(zoneDict):
     # Loop over records fcreated by json2Dict
     for zone in zoneDict:
         zoneOutput = "$TTL	604800\n"
-        zoneOutput += "@	IN	SOA	ns1.{}. root.{}. (\n".format(zone[0], zone[0])
-        zoneOutput += "\t\t\t16\t; Serial\n"
-        zoneOutput += "\t\t\t3h\t; Refresh\n"
-        zoneOutput += "\t\t\t15\t; Retry\n"
+        zoneOutput += "@	IN	SOA	{}. {}. (\n".format(zone[2], zone[3].replace("@", "."))
+        zoneOutput += "\t\t\t22\t; Serial\n"
+        zoneOutput += "\t\t\t24h\t; Refresh\n"
+        zoneOutput += "\t\t\t1h\t; Retry\n"
         zoneOutput += "\t\t\t1w\t; Expire\n"
         zoneOutput += "\t\t\t3h)\t; Negative Cache TTL\n\n"
-        zoneOutput += "; NS records\n"
-        zoneOutput += "\t\t\tIN  NS  ns1.{}.\n".format(zone[0])
-        zoneOutput += "\t\t\tIN  NS  ns2.{}.\n".format(zone[0])
-        zoneOutput += "\t\t\tIN  NS  ns3.{}.\n\n".format(zone[0])
         zoneOutput += "; A records\n"
+        a_records = {}
+        cname_records = {}
         for record in zone[1]:  # Loop over a records in the dict
-            zoneOutput += "{}\t\tIN  A   {}\n".format(record['a'], record['ip'])
-        if type(zone[2]) == list:
-            zoneOutput += "\n; CNAME records\n"
-            for record in zone[2]:  # Loop over cname records in the dict
-                if record['pointer'] == '@':
-                    record['pointer'] = zone[0] + '.'
-                zoneOutput += "{}\t\t\tIN\tCNAME\t{}\n".format(record['cname'], record['pointer'])
-        writeZone("zone_files/db."+zone[0], zoneOutput)
+            if (record['type'] == 'a'):
+                a_records[record['name']] = record['pointer']
+            elif (record['type'] == 'cname'):
+                cname_records[record['name']] = record['pointer']
+        for key, value in a_records.items():
+            zoneOutput += "{}\t\t\tIN  A   {}\n".format(key, value)
+        zoneOutput += "\n; CNAME records\n"
+        for key, value in cname_records.items():
+            if (value == '@'):
+                value = zone[0]
+            zoneOutput += "{}\t\t\tIN  CNAME   {}\n".format(key, value)
+        zoneOutput += ";\n"
+        file_path = os.path.join(cwd, "zone_files/db."+zone[0])
+        writeFile(file_path, zoneOutput)
 
 
 def createConfLocal(zoneDict):
@@ -106,10 +114,11 @@ def createConfLocal(zoneDict):
         confLocal += "\ttype master;\n"
         confLocal += "\tfile \"/etc/bind/zones/db.{}\"; # zone file path\n".format(zone[0])
         confLocal += "\tallow-update { none; };\n"
-        confLocal += "\tallow-transfer  { 10.0.0.14; 10.0.0.13; };\n"
-        confLocal += "\talso-notify { 10.0.0.14; 10.0.0.13; };\n"
+        confLocal += "\tallow-transfer  { 10.0.0.33; 10.0.0.37; };\n"
+        confLocal += "\talso-notify { 10.0.0.33; 10.0.0.37; };\n"
         confLocal += "};\n\n"
-    writeZone("named.conf.local", confLocal)
+    file_path = os.path.join(cwd, "named.conf.local")
+    writeFile(file_path, confLocal)
 
 
 def main():
