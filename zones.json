@@ -1,9 +1,11 @@
 [
 	{
 		"zone": "example1.com",
-        "soa": "ns1.nameserver.com",
+        "soa": "ns1.example1.com",
         "email": "user@domain.com",
 		"records": [
+            {"type":"ns", "name":"ns1", "pointer": "ns1.example1.com."},
+            {"type":"ns", "name":"ns2", "pointer": "ns2.example1.com."},
             {"type":"a", "name":"@", "pointer": "123.123.123.123"},
             {"type":"a", "name":"server1", "pointer": "1.2.3.4"},
             {"type":"a", "name":"server2", "pointer": "5.6.7.8"},
@@ -14,18 +16,22 @@
 	},
 	{
 		"zone": "example2.com",
-        "soa": "ns1.anothernameserver.us",
+        "soa": "ns1.example2.us",
         "email": "you@domain.com",
 		"records": [
+            {"type":"ns", "name":"ns1", "pointer": "ns1.anothernameserver.us."},
+            {"type":"ns", "name":"ns2", "pointer": "ns2.anothernameserver.us."},
             {"type":"a", "name":"@", "pointer": "1.1.1.1"},
             {"type":"cname", "name":"www", "pointer": "@"}
         ]
 	},
 	{
-		"zone": "example3.net",
+		"zone": "skipitydoda.com",
         "soa": "ns1.skipitydoda.com",
         "email": "email@domain.com",
 		"records": [
+            {"type":"ns", "name":"ns1", "pointer": "ns1.skipitydoda.com."},
+            {"type":"ns", "name":"ns2", "pointer": "ns2.skipitydoda.com."},
             {"type":"cname", "name":"www", "pointer": "example1.com"}
         ]
 	}

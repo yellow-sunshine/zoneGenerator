@@ -84,20 +84,29 @@ def createZoneFiles(zoneDict):
         zoneOutput += "\t\t\t1h\t; Retry\n"
         zoneOutput += "\t\t\t1w\t; Expire\n"
         zoneOutput += "\t\t\t3h)\t; Negative Cache TTL\n\n"
-        zoneOutput += "; A records\n"
         a_records = {}
         cname_records = {}
+        ns_records = {}
         for record in zone[1]:  # Loop over a records in the dict
             if (record['type'] == 'a'):
                 a_records[record['name']] = record['pointer']
             elif (record['type'] == 'cname'):
                 cname_records[record['name']] = record['pointer']
+            elif (record['type'] == 'ns'):
+                ns_records[record['name']] = record['pointer']
+
+        zoneOutput += "\n; NS records\n"
+        for key, value in ns_records.items():
+            zoneOutput += "\t\t\tIN  NS   {}\n".format(value)
+
+        zoneOutput += "\n; A records\n"
         for key, value in a_records.items():
             zoneOutput += "{}\t\t\tIN  A   {}\n".format(key, value)
+
         zoneOutput += "\n; CNAME records\n"
         for key, value in cname_records.items():
             if (value == '@'):
-                value = zone[0]
+                value = zone[0] + '.'
             zoneOutput += "{}\t\t\tIN  CNAME   {}\n".format(key, value)
         zoneOutput += ";\n"
         file_path = os.path.join(cwd, "zone_files/db."+zone[0])
@@ -106,7 +115,7 @@ def createZoneFiles(zoneDict):
 
 def createConfLocal(zoneDict):
     # Create named.config.local file with basic information.
-    # This could be added on in the future to set slave master options for each domain
+    # This could be added on in the future to create slave master options for each domain
     confLocal = ""
     for zone in zoneDict:
         confLocal += "zone \"{}\" ".format(zone[0])
